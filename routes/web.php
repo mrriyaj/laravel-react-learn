@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -25,9 +25,29 @@ Route::get('/', function () {
     ]);
 });
 
+// Brand routes
+Route::get('/brands', [BrandController::class, 'index'])->name('brands.index');
+Route::get('/brands/create', [BrandController::class, 'create'])->name('brands.create');
+Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
+Route::get('/brands/{brand}', [BrandController::class, 'show'])->name('brands.show');
+Route::get('/brands/{brand}/edit', [BrandController::class, 'edit'])->name('brands.edit');
+ Route::put('/brands/{brand}', [BrandController::class, 'update'])->name('brands.update');
+ Route::delete('/brands/{brand}', [BrandController::class, 'destroy'])->name('brands.destroy');
+
+Route::resource('brands', BrandController::class)->middleware('auth');
+
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    // Define $someData with the data you want to pass to the view
+    $someData = [
+        'exampleKey' => 'exampleValue',
+        'anotherKey' => 'anotherValue',
+        // Add more key-value pairs as needed
+    ];
+
+    return Inertia::render('Dashboard')->with('someData', $someData);
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
