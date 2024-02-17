@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'user_type',
     ];
 
     /**
@@ -48,4 +49,5 @@ class User extends Authenticatable
     {
         return $this->hasMany(Brand::class);
     }
+    
 }
