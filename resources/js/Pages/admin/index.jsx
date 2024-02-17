@@ -3,6 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 import axios from "axios";
 
+
 export default function Index({ auth, users: initialUsers }) {
     const [users, setUsers] = React.useState(initialUsers);
 
@@ -78,6 +79,30 @@ export default function Index({ auth, users: initialUsers }) {
                                                         </button>
                                                     </form>
                                                 )}
+
+                                                <Link
+                                                    href={route("admin.edit", {
+                                                        id: user.id,
+                                                    })}
+                                                    className="bg-green-100 text-green-800 active:bg-green-100 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:text-green-400 border border-green-400"
+                                                >
+                                                    Edit
+                                                </Link>
+
+                                                <form
+                                                    onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        axios.delete(route('admin.destroy', { id: user.id })).then(() => {
+                                                            setUsers(users.filter(u => u.id !== user.id));
+                                                        });
+                                                    }}
+                                                >
+                                                    <button
+                                                        className="bg-red-100 text-red-800 active:bg-red-200 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:text-red-400 border border-red-400"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     ))}

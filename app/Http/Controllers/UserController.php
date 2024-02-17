@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -22,6 +24,20 @@ class UserController extends Controller
 
         return Inertia::render('admin/index');
 
+        $loggedInUser = Auth::user();
+        $users = User::query();
+
+        if ($loggedInUser->user_type === 'superadmin') {
+            $users->where('user_type', '!=', 'superadmin');
+        } elseif ($loggedInUser->user_type === 'admin') {
+            $users->whereNotIn('user_type', ['superadmin', 'admin']);
+        }
+
+        $users = $users->get();
+
+        return Inertia::render('admin/index', [
+            'users' => $users,
+        ]);
     }
 
     /**
@@ -46,6 +62,14 @@ class UserController extends Controller
         }
 
         // Add your logic for storing a user
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+            'user_type' => 'required|in:superadmin,admin,shopowner,user',
+        ]);
+
+        User::create($validatedData);
 
         return redirect()->route('admin.index')->with('success', 'User created successfully!');
     }
@@ -96,8 +120,35 @@ class UserController extends Controller
         // Add your logic for updating a user
 
         return redirect()->route('admin.index')->with('success', 'User updated successfully!');
-    }
+    
 
+        $user = User::findOrFail($id);
+    
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'password' => 'nullable|min:8', // Make the password field nullable
+            'user_type' => 'required|in:superadmin,admin,shopowner,user',
+        ]);
+    
+        // Check if a new password is provided
+        if ($request->password) {
+            // Update the validated data with the hashed password using bcrypt
+            $validatedData['password'] = bcrypt($request->password);
+        } else {
+            // If no new password is provided, remove the 'password' key from the array
+            unset($validatedData['password']);
+        }
+    
+        $user->update($validatedData);
+    
+        return redirect()->route('admin.index')->with('success', 'User updated successfully!');
+    }
+    
     /**
      * Remove the specified resource from storage.
      */
@@ -111,5 +162,11 @@ class UserController extends Controller
         $user->delete();
 
         return response()->json(['message' => 'User deleted successfully']);
+
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return response()->json(['message' => 'user deleted successfully']);
     }
 }
+
