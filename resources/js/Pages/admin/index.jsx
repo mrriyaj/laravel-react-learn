@@ -49,6 +49,36 @@ export default function Index({ auth, users: initialUsers }) {
                                                 {user.user_type}
                                             </td>
                                             <td className="border-t-0 flex px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {/* Edit link */}
+                                                {auth.user && auth.user.can('update_user', user) && (
+                                                    <Link
+                                                        href={route("admin.edit", {
+                                                            id: user.id,
+                                                        })}
+                                                        className="bg-green-100 text-green-800 active:bg-green-100 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:text-green-400 border border-green-400"
+                                                    >
+                                                        Edit
+                                                    </Link>
+                                                )}
+
+                                                {/* Delete button */}
+                                                {auth.user && auth.user.can('delete_user', user) && (
+                                                    <form
+                                                        onSubmit={(e) => {
+                                                            e.preventDefault();
+                                                            axios.delete(route('admin.destroy', { id: user.id })).then(() => {
+                                                                setUsers(users.filter(u => u.id !== user.id));
+                                                            });
+                                                        }}
+                                                    >
+                                                        <button
+                                                            type="submit"
+                                                            className="bg-red-100 text-red-800 active:bg-red-200 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:text-red-400 border border-red-400"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                )}
 
                                                 <Link
                                                     href={route("admin.edit", {

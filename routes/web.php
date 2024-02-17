@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,11 +29,47 @@ Route::get('/', function () {
     ]);
 });
 
+// Brands Routes
+Route::middleware(['auth'])->group(function () {
+    Route::group(['prefix' => 'brands'], function () {
+        Route::get('/', [BrandController::class, 'index'])->name('brands.index');
+        Route::get('/create', [BrandController::class, 'create'])->name('brands.create');
+        Route::post('/', [BrandController::class, 'store'])->name('brands.store');
+        Route::get('/{brand}', [BrandController::class, 'show'])->name('brands.show');
+        Route::get('/{brand}/edit', [BrandController::class, 'edit'])->name('brands.edit');
+        Route::put('/{brand}', [BrandController::class, 'update'])->name('brands.update');
+        Route::delete('/{brand}', [BrandController::class, 'destroy'])->name('brands.destroy');
+    });
+});
+
+// User Routes
+Route::middleware(['auth'])->group(function () {
+    Route::group(['prefix' => 'admin'], function () {
+        Route::get('/', [UserController::class, 'index'])->name('admin.index');
+        Route::get('/create', [UserController::class, 'create'])->name('admin.create');
+        Route::post('/store', [UserController::class, 'store'])->name('admin.store');
+        Route::get('/{id}', [UserController::class, 'show'])->name('admin.show');
+        Route::get('/{id}/edit', [UserController::class, 'edit'])->name('admin.edit');
+        Route::put('/{id}/update', [UserController::class, 'update'])->name('admin.update');
+        Route::delete('/{id}/destroy', [UserController::class, 'destroy'])->name('admin.destroy');
+    });
+});
+
+// Categories Routes
+Route::middleware(['auth'])->group(function () {
+    Route::resource('categories', CategoryController::class);
+});
+
+// Products Routes
+Route::middleware(['auth'])->group(function () {
+    Route::resource('products', ProductController::class);
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

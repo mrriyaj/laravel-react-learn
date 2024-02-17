@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -15,6 +16,14 @@ class UserController extends Controller
      */
     public function index()
     {
+        if (Gate::denies('view_any_user')) {
+            abort(403, 'Unauthorized access!');
+        }
+
+        // Customize your logic for displaying users based on the user's role
+
+        return Inertia::render('admin/index');
+
         $loggedInUser = Auth::user();
         $users = User::query();
 
@@ -36,6 +45,10 @@ class UserController extends Controller
      */
     public function create()
     {
+        if (Gate::denies('create_user')) {
+            abort(403, 'Unauthorized access!');
+        }
+
         return Inertia::render('admin/create');
     }
 
@@ -44,6 +57,11 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        if (Gate::denies('create_user')) {
+            abort(403, 'Unauthorized access!');
+        }
+
+        // Add your logic for storing a user
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -61,6 +79,10 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
+        if (Gate::denies('view_user')) {
+            abort(403, 'Unauthorized access!');
+        }
+
         $user = User::findOrFail($id);
 
         return Inertia::render('admin/show', [
@@ -73,6 +95,10 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
+        if (Gate::denies('update_user')) {
+            abort(403, 'Unauthorized access!');
+        }
+
         $user = User::findOrFail($id);
 
         return Inertia::render('admin/edit', [
@@ -85,6 +111,17 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        if (Gate::denies('update_user')) {
+            abort(403, 'Unauthorized access!');
+        }
+
+        $user = User::findOrFail($id);
+
+        // Add your logic for updating a user
+
+        return redirect()->route('admin.index')->with('success', 'User updated successfully!');
+    
+
         $user = User::findOrFail($id);
     
         $validatedData = $request->validate([
@@ -117,6 +154,15 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
+        if (Gate::denies('delete_user')) {
+            abort(403, 'Unauthorized access!');
+        }
+
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully']);
+
         $user = User::findOrFail($id);
         $user->delete();
 

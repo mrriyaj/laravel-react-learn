@@ -24,6 +24,26 @@ class User extends Authenticatable
         'user_type',
     ];
 
+    public function isAdmin()
+    {
+        return $this->user_type === 'admin';
+    }
+
+    public function isSuperadmin()
+    {
+        return $this->user_type === 'superadmin';
+    }
+
+    public function isShopowner()
+    {
+        return $this->user_type === 'shopowner';
+    }
+
+    public function isUser()
+    {
+        return $this->user_type === 'user';
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
