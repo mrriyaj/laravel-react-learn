@@ -1,15 +1,15 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProfileController;
-
-=======
 use App\Http\Controllers\UserController;
->>>>>>> e885c52fac4634a568dce93134433aeb2d07420f
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -40,12 +40,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-<<<<<<< HEAD
 
 // Product Routes
 Route::resource('products', ProductController::class)
     ->middleware('auth');
-=======
+
+Route::resource('categories', CategoryController::class);
+
 Route::middleware(['auth' ] )->group(function () {
     Route::get('/admin', [UserController::class, 'index'])->name('admin.index');
     Route::get('/admin/create', [UserController::class, 'create'])->name('admin.create');
@@ -57,6 +58,5 @@ Route::middleware(['auth' ] )->group(function () {
     Route::delete('/admin/{id}/destroy', [UserController::class, 'destroy'])->name('admin.destroy');
 });
 
->>>>>>> e885c52fac4634a568dce93134433aeb2d07420f
 
 require __DIR__.'/auth.php';
